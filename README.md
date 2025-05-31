@@ -17,9 +17,6 @@ yarn
 yarn serve
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in a WebGPU-compatible browser.  
-(Chrome 113+ recommended — may require the `--enable-unsafe-webgpu` flag.)
-
 ---
 
 ## 📁 Project Structure
