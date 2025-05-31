@@ -5,6 +5,8 @@ This project initializes a WebGPU context and provides rendering primitives such
 
 ---
 
+Working on: interaction. Time to build a game with this
+
 ## 🚀 Getting Started
 
 ```bash
@@ -24,16 +26,21 @@ Then open [http://localhost:3000](http://localhost:3000) in a WebGPU-compatible 
 
 ```
 gpu-lab/
-├── public/                 # Static assets
+├── public/
 ├── src/
-│   ├── core/               # Engine, scene, camera, math types
+│   ├── app/
+│   ├── gpulab/
+│   │   ├── core/          # webgpu engine
+│   │   │   ├── camera/
+│   │   │   ├── engine/
+│   │   │   ├── scene/
+│   │   │   ├── ...../
+│   │   ├── objects/        # Cubes, planes, grids
+│   │   │   ├── cubes/
+│   │   │   ├── grids/
+│   │   │   ├── planes/
 │   ├── gui/                # GUIView and parameter controls (tweakpane)
-│   ├── objects/            # Cubes, planes, grids
-│   │   ├── cubes/
-│   │   ├── planes/
-│   │   └── grids/
 │   ├── shaders/            # WGSL shader modules
-│   ├── data/               # Position presets and input datasets
 │   └── main.ts             # Application bootstrap
 ├── index.html              # HTML entry point
 ├── tsconfig.json           # TypeScript configuration
@@ -45,13 +52,11 @@ gpu-lab/
 
 ## ✨ Features
 
-- ✅ WebGPU rendering context
-- 🔲 Cube and plane rendering with WGSL shaders
-- 🖼️ Texture sampling and solid color modes
-- 🟦 Pixel grid rendering with animation support
-- 🎮 Real-time camera and object control via Tweakpane
-- ⏱️ GSAP integration for smooth animations
-- 🧪 Modular structure to support shader and object experimentation
+- WebGPU rendering context
+- Cubes, planes and grids rendering with WGSL shaders
+- Real-time camera and object control via Tweakpane
+- GSAP integration for smooth animations
+- Modular structure to support shader and object experimentation
 
 ---
 
