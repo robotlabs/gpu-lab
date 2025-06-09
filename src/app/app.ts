@@ -149,7 +149,7 @@ export default class App {
     //** single cube */
     const rnMultiplierPos = 10;
     for (let i = 0; i < 1000; i++) {
-      const cube = new Cube(device, format, cubeShaderModule, {
+      const cube = new Cube(device, format, {
         posX: Math.random() * rnMultiplierPos - 3,
         posY: Math.random() * rnMultiplierPos - 3,
         posZ: Math.random() * rnMultiplierPos - 0,

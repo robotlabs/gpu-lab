@@ -26,15 +26,9 @@ export class Cube implements Object3D {
 
   private tweens: gsap.core.Tween[] = [];
 
-  constructor(
-    device: GPUDevice,
-    format: GPUTextureFormat,
-    shader: GPUShaderModule,
-    props: CubeProps
-  ) {
+  constructor(device: GPUDevice, format: GPUTextureFormat, props: CubeProps) {
     this.device = device;
     this.format = format;
-    this.shader = shader;
     this.props = props;
   }
 
@@ -52,7 +46,7 @@ export class Cube implements Object3D {
     this.pipeline = createSingleCubePipeline(
       this.device,
       this.format,
-      this.shader
+      this.props.shader
     );
     this.transformBuffer = this.device.createBuffer({
       size: (4 * 16 + 4) * 4,
