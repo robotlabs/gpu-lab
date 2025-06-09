@@ -1,4 +1,4 @@
-import { vec3 } from "@/gpulab/core/types";
+import { vec3 } from "gl-matrix";
 import { Pane } from "tweakpane";
 
 interface CameraParams {

@@ -11,7 +11,7 @@ import singlePlaneShader from "@/shaders/plane-shader.wgsl";
 //* gpu lab */
 import { Engine } from "@/gpulab/core/engine";
 import { Scene } from "@/gpulab/core/scene";
-import { CameraAxis, vec3 } from "@/gpulab/core/types";
+import { CameraAxis } from "@/gpulab/core/types";
 
 //* cubes
 import { Cube } from "@/gpulab/objects/cubes/cube";
@@ -23,6 +23,7 @@ import { Plane } from "@/gpulab/objects/planes/plane";
 import { PixelGridLayout } from "@/gpulab/objects/grids/pixel-grid-layout";
 
 import { createTextureFromImage } from "@/gpulab/objects/planes/plane-utils";
+import { vec3 } from "gl-matrix";
 
 export default class App {
   private stats!: ReturnType<typeof Stats>;

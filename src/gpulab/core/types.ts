@@ -11,5 +11,3 @@ export interface UsesCamera {
   setCamera(camera: Camera): void;
 }
 export type CameraAxis = "x" | "y" | "z";
-
-export type vec3 = [number, number, number];

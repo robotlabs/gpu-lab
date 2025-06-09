@@ -6,7 +6,7 @@ import {
 import { Scene } from "./scene";
 import { Camera } from "./camera";
 import { sampleCount } from "./config";
-import { vec3 } from "./types";
+import { vec3 } from "gl-matrix";
 
 export class Engine {
   private device!: GPUDevice;

@@ -435,11 +435,6 @@ vite@^6.0.3:
   optionalDependencies:
     fsevents "~2.3.3"
 
-webgpu-matrix@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/webgpu-matrix/-/webgpu-matrix-1.0.0.tgz#36b46467fbc5cb03d96a45c534bf116062b7ebaa"
-  integrity sha512-ZrJDZIOelyQ6KqjiLCRpPIDsxaYmDQEr/J+BFHURsTjY9F39Pj0ltIfZQX4bWZRGMHH44aCxVtPy1KcKGinfzg==
-
 wgpu-matrix@^3.3.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/wgpu-matrix/-/wgpu-matrix-3.4.0.tgz#b1ed1456e0411d0803c6f094c5a3444b0ebd79d1"
