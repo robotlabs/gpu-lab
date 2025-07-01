@@ -4,7 +4,7 @@ import {
   createMultiSampledTexture,
 } from "./utils";
 import { Scene } from "./scene";
-import { Camera } from "./camera";
+import { Camera, CameraType } from "./camera";
 import { sampleCount } from "./config";
 import { vec3 } from "gl-matrix";
 
@@ -25,7 +25,23 @@ export class Engine {
     cameraPos: vec3 = [5, 5, 20]
   ) {
     this.canvas = canvas;
-    this.camera = new Camera(cameraPos);
+
+    // Perspective camera
+    const perspCam = new Camera({
+      type: CameraType.Perspective,
+      fov: Math.PI / 3,
+      aspect: canvas.width / canvas.height,
+    });
+
+    // Orthographic camera
+    const orthoCam = new Camera({
+      type: CameraType.Orthographic,
+      aspect: canvas.width / canvas.height,
+      orthoSize: 15, // half-height of view volume
+      near: -50,
+      far: 50,
+    });
+    this.camera = perspCam; //new Camera(cameraPos);
   }
 
   async init(): Promise<void> {

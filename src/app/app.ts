@@ -7,6 +7,7 @@ import gsap from "gsap";
 import cubeShader from "@/shaders/cube-shader.wgsl";
 import gridShader from "@/shaders/grid-shader.wgsl";
 import singlePlaneShader from "@/shaders/plane-shader.wgsl";
+import glbShader from "@/shaders/glb-shader.wgsl";
 
 //* gpu lab */
 import { Engine } from "@/gpulab/core/engine";
@@ -24,6 +25,7 @@ import { PixelGridLayout } from "@/gpulab/objects/grids/pixel-grid-layout";
 
 import { createTextureFromImage } from "@/gpulab/objects/planes/plane-utils";
 import { vec3 } from "gl-matrix";
+import { GLBModel } from "@/gpulab/objects/glb/glb-model";
 
 export default class App {
   private stats!: ReturnType<typeof Stats>;
@@ -55,7 +57,9 @@ export default class App {
     const format = this.engine.getFormat();
 
     // this.testCubes(device, format);
-    this.testGrids(device, format);
+    // this.testGrids(device, format);
+    // this.testGLBModel(device, format);
+    this.testGLBModel(device, format);
     // this.testPlanes(device, format);
 
     this.setupResizeListener();
@@ -112,6 +116,20 @@ export default class App {
     const format = this.engine.getFormat();
 
     this.testPlanes(device, format);
+  }
+  public runGlb() {
+    this.scene.clear();
+    const device = this.engine.getDevice();
+    const format = this.engine.getFormat();
+
+    this.testGLBModel(device, format);
+  }
+  public runGlb2() {
+    this.scene.clear();
+    const device = this.engine.getDevice();
+    const format = this.engine.getFormat();
+
+    this.testGLBModel2(device, format);
   }
 
   private setupResizeListener(): void {
@@ -348,5 +366,84 @@ export default class App {
 
       plane.addTween(tween);
     }
+  }
+  private async testGLBModel2(
+    device: GPUDevice,
+    format: GPUTextureFormat
+  ): Promise<void> {
+    const glbShaderModule = device.createShaderModule({ code: glbShader });
+
+    const glbModel = new GLBModel(
+      this.engine.getDevice(),
+      this.engine.getFormat(),
+      {
+        url: "./models/test.glb",
+        posX: 3.5,
+        posY: 4,
+        posZ: 16,
+        rotX: 0,
+        rotY: 0,
+        rotZ: 0,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        scaleZ: 0.2,
+        shader: glbShaderModule,
+      }
+    );
+    const tween = gsap.to(glbModel.getProps(), {
+      rotX: 0,
+      rotY: Math.PI * 2,
+      rotZ: 0,
+      duration: 4,
+      ease: "power4.inOut",
+      yoyo: true,
+      repeat: -1,
+      onUpdate: () => glbModel.updateCameraTransform(),
+    });
+    glbModel.addTween(tween);
+
+    glbModel.setCamera(this.engine.getCamera());
+    await glbModel.init();
+    this.scene.add(glbModel);
+  }
+
+  private async testGLBModel(
+    device: GPUDevice,
+    format: GPUTextureFormat
+  ): Promise<void> {
+    const glbShaderModule = device.createShaderModule({ code: glbShader });
+
+    const glbModel = new GLBModel(
+      this.engine.getDevice(),
+      this.engine.getFormat(),
+      {
+        url: "./models/car4.glb",
+        posX: 3.5,
+        posY: 4,
+        posZ: 16,
+        rotX: 0,
+        rotY: 0,
+        rotZ: 0,
+        scaleX: 10,
+        scaleY: 10,
+        scaleZ: 10,
+        shader: glbShaderModule,
+      }
+    );
+    const tween = gsap.to(glbModel.getProps(), {
+      rotX: 0,
+      rotY: Math.PI * 2,
+      rotZ: 0,
+      duration: 4,
+      ease: "power4.inOut",
+      yoyo: true,
+      repeat: -1,
+      onUpdate: () => glbModel.updateCameraTransform(),
+    });
+    glbModel.addTween(tween);
+
+    glbModel.setCamera(this.engine.getCamera());
+    await glbModel.init();
+    this.scene.add(glbModel);
   }
 }

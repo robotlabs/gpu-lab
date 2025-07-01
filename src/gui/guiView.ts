@@ -72,5 +72,21 @@ export class GUIView {
         console.warn("runPlanes() is not defined on app.");
       }
     });
+    //@ts-ignore
+    this.pane.addButton({ title: "Run Glb" }).on("click", () => {
+      if ("runGlb" in this.app && typeof this.app.runGlb === "function") {
+        this.app.runGlb();
+      } else {
+        console.warn("runGlb() is not defined on app.");
+      }
+    });
+    //@ts-ignore
+    this.pane.addButton({ title: "Run Glb 2" }).on("click", () => {
+      if ("runGlb2" in this.app && typeof this.app.runGlb2 === "function") {
+        this.app.runGlb2();
+      } else {
+        console.warn("runGlb() is not defined on app.");
+      }
+    });
   }
 }

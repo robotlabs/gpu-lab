@@ -127,6 +127,13 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.25.5.tgz#7fc114af5f6563f19f73324b5d5ff36ece0803d1"
   integrity sha512-TXv6YnJ8ZMVdX+SXWVBo/0p8LTcrUYngpWjvm91TMjjBQii7Oz11Lw5lbDV5Y0TzuhSJHwiH4hEtC1I42mMS0g==
 
+"@gltf-transform/core@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@gltf-transform/core/-/core-4.1.4.tgz#bcffc97eb128a2f1563ad6055ff461b4c7edacce"
+  integrity sha512-TE6MGzlmsFWR8mkWNDSM7KWUjAeySBYN6MchL8YIzDECLpkFzXeO69K2yLjhKFfPmL27ZYe17vgzqwlcGF+X3A==
+  dependencies:
+    property-graph "^3.0.0"
+
 "@rollup/pluginutils@^5.1.4":
   version "5.1.4"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.1.4.tgz#bb94f1f9eaaac944da237767cdfee6c5b2262d4a"
@@ -342,6 +349,11 @@ postcss@^8.5.3:
     nanoid "^3.3.8"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
+
+property-graph@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/property-graph/-/property-graph-3.0.0.tgz#c3187a0389a7ec56b8c9207fe3867b2ba3d1e6df"
+  integrity sha512-TnzxUsttmGtw+OiU0LDw+0FlMbJ8vV8pOjyDI7+Kdni4Tj0hW5BFh7TatQu7Y68hcvvFmiFOHilKShsA4R82fA==
 
 rollup@^4.34.9:
   version "4.41.1"
