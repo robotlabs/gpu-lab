@@ -240,134 +240,119 @@ export async function processPrimitive(
   textureCache: Map<string, GPUTexture>,
   device: GPUDevice
 ): Promise<MeshData | null> {
-  const position = primitive.getAttribute("POSITION")?.getArray();
-
+  const position = primitive
+    .getAttribute("POSITION")
+    ?.getArray() as Float32Array;
   const normal =
     primitive.getAttribute("NORMAL")?.getArray() ??
     new Float32Array((position.length / 3) * 3).fill(0);
-
   const uv =
     primitive.getAttribute("TEXCOORD_0")?.getArray() ??
     new Float32Array((position.length / 3) * 2).fill(0);
 
+  // gestisco i colori dei vertici
   let color: Float32Array;
-  const colorAttribute = primitive.getAttribute("COLOR_0");
+  const colorAttr = primitive.getAttribute("COLOR_0");
   const vertexCount = position.length / 3;
-
-  if (colorAttribute) {
-    const colorArray = colorAttribute.getArray();
-    const componentsPerVertex = colorArray.length / vertexCount;
-
+  if (colorAttr) {
+    const cArr = colorAttr.getArray() as Float32Array;
+    const comps = cArr.length / vertexCount;
     color = new Float32Array(vertexCount * 4);
-
-    if (componentsPerVertex === 3) {
+    if (comps === 3) {
       for (let i = 0; i < vertexCount; i++) {
-        color[i * 4] = colorArray[i * 3];
-        color[i * 4 + 1] = colorArray[i * 3 + 1];
-        color[i * 4 + 2] = colorArray[i * 3 + 2];
-        color[i * 4 + 3] = 1.0;
+        color.set([cArr[i * 3], cArr[i * 3 + 1], cArr[i * 3 + 2], 1], i * 4);
       }
-    } else if (componentsPerVertex === 4) {
-      color.set(colorArray);
+    } else if (comps === 4) {
+      color.set(cArr);
     } else {
-      color.fill(1.0);
+      color.fill(1);
     }
   } else {
-    color = new Float32Array(vertexCount * 4).fill(1.0);
+    color = new Float32Array(vertexCount * 4).fill(1);
   }
 
-  // Enhanced material processing
+  // material & texture
   const material = primitive.getMaterial();
   let materialData: MeshData["material"] = {
     baseColor: [1, 1, 1, 1],
     texture: defaultTexture,
   };
-
   if (material) {
-    const baseColorFactor = material.getBaseColorFactor();
-    if (baseColorFactor && baseColorFactor.length >= 3) {
-      materialData.baseColor = [
-        baseColorFactor[0] || 1,
-        baseColorFactor[1] || 1,
-        baseColorFactor[2] || 1,
-        baseColorFactor[3] || 1,
-      ];
-    } else {
-      console.warn(
-        `No valid base color factor found for material "${
-          material.getName() || "unnamed"
-        }"`
-      );
-    }
-
-    // Handle texture
-    const baseColorTexture = material.getBaseColorTexture();
-    if (baseColorTexture) {
+    const bcf = material.getBaseColorFactor();
+    if (bcf?.length >= 4)
+      materialData.baseColor = [bcf[0], bcf[1], bcf[2], bcf[3]];
+    const tex = material.getBaseColorTexture();
+    if (tex) {
       try {
         materialData.texture = await createTextureFromGLTFTexture(
-          baseColorTexture,
+          tex,
           defaultTexture,
           textureCache,
           device
         );
-      } catch (error) {
-        console.error(`Failed to load texture for mesh "${meshName}":`, error);
+      } catch {
         materialData.texture = defaultTexture;
       }
     }
   }
 
-  const indices = primitive.getIndices()?.getArray();
+  // ---------------------------------------------------
+  // qui castiamo gli indici da 16 a 32 bit, se servisse
+  let indices = primitive.getIndices()?.getArray() as
+    | Uint16Array
+    | Uint32Array
+    | undefined;
   if (!indices) {
     console.warn(`Skipping primitive for mesh "${meshName}" without indices`);
     return null;
   }
+  if (indices instanceof Uint16Array) {
+    // up-cast a 32 bit
+    indices = new Uint32Array(indices);
+  }
+  // ---------------------------------------------------
 
+  // costruisco il buffer dei vertici
   const vertexData = new Float32Array(vertexCount * 12);
   for (let i = 0; i < vertexCount; i++) {
-    const offset = i * 12;
-    //* Position
-    vertexData[offset] = position[i * 3];
-    vertexData[offset + 1] = position[i * 3 + 1];
-    vertexData[offset + 2] = position[i * 3 + 2];
-    //* Normal
-    vertexData[offset + 3] = normal[i * 3];
-    vertexData[offset + 4] = normal[i * 3 + 1];
-    vertexData[offset + 5] = normal[i * 3 + 2];
-    //* UV
-    vertexData[offset + 6] = uv[i * 2];
-    vertexData[offset + 7] = uv[i * 2 + 1];
-    //* Color
-    vertexData[offset + 8] = color[i * 4];
-    vertexData[offset + 9] = color[i * 4 + 1];
-    vertexData[offset + 10] = color[i * 4 + 2];
-    vertexData[offset + 11] = color[i * 4 + 3];
+    const o = i * 12;
+    vertexData[o] = position[i * 3];
+    vertexData[o + 1] = position[i * 3 + 1];
+    vertexData[o + 2] = position[i * 3 + 2];
+    vertexData[o + 3] = normal[i * 3];
+    vertexData[o + 4] = normal[i * 3 + 1];
+    vertexData[o + 5] = normal[i * 3 + 2];
+    vertexData[o + 6] = uv[i * 2];
+    vertexData[o + 7] = uv[i * 2 + 1];
+    vertexData[o + 8] = color[i * 4];
+    vertexData[o + 9] = color[i * 4 + 1];
+    vertexData[o + 10] = color[i * 4 + 2];
+    vertexData[o + 11] = color[i * 4 + 3];
   }
-
   const vertexBuffer = device.createBuffer({
     size: vertexData.byteLength,
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
   });
   device.queue.writeBuffer(vertexBuffer, 0, vertexData);
 
+  // e il buffer degli indici (ora sempre allineato a 4 byte)
   const indexBuffer = device.createBuffer({
     size: indices.byteLength,
     usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
   });
   device.queue.writeBuffer(indexBuffer, 0, indices);
 
+  // buffer di trasformazione uniforme
   const transformBuffer = device.createBuffer({
     size: 64 * 4,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
 
-  //   this.updateGlobalAABB(position, nodeTransform);
-
   return {
     vertexBuffer,
     indexBuffer,
     indexCount: indices.length,
-    indexFormat: indices instanceof Uint32Array ? "uint32" : "uint16",
+    indexFormat: "uint32", // ora è sempre 32 bit
     transform: nodeTransform,
     transformBuffer,
     bindGroup: null as any,

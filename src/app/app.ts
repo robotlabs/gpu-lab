@@ -367,7 +367,7 @@ export default class App {
       plane.addTween(tween);
     }
   }
-  private async testGLBModel2(
+  private async testGLBModel(
     device: GPUDevice,
     format: GPUTextureFormat
   ): Promise<void> {
@@ -377,16 +377,16 @@ export default class App {
       this.engine.getDevice(),
       this.engine.getFormat(),
       {
-        url: "./models/test.glb",
+        url: "./models/car7.glb",
         posX: 3.5,
         posY: 4,
         posZ: 16,
         rotX: 0,
         rotY: 0,
         rotZ: 0,
-        scaleX: 0.2,
-        scaleY: 0.2,
-        scaleZ: 0.2,
+        scaleX: 1,
+        scaleY: 1,
+        scaleZ: 1,
         shader: glbShaderModule,
       }
     );
@@ -407,7 +407,7 @@ export default class App {
     this.scene.add(glbModel);
   }
 
-  private async testGLBModel(
+  private async testGLBModel2(
     device: GPUDevice,
     format: GPUTextureFormat
   ): Promise<void> {
@@ -417,16 +417,16 @@ export default class App {
       this.engine.getDevice(),
       this.engine.getFormat(),
       {
-        url: "./models/car4.glb",
+        url: "./models/city2.glb",
         posX: 3.5,
         posY: 4,
         posZ: 16,
         rotX: 0,
         rotY: 0,
         rotZ: 0,
-        scaleX: 10,
-        scaleY: 10,
-        scaleZ: 10,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        scaleZ: 0.2,
         shader: glbShaderModule,
       }
     );
