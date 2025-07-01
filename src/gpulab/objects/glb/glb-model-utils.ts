@@ -250,7 +250,6 @@ export async function processPrimitive(
     primitive.getAttribute("TEXCOORD_0")?.getArray() ??
     new Float32Array((position.length / 3) * 2).fill(0);
 
-  // gestisco i colori dei vertici
   let color: Float32Array;
   const colorAttr = primitive.getAttribute("COLOR_0");
   const vertexCount = position.length / 3;
@@ -271,7 +270,6 @@ export async function processPrimitive(
     color = new Float32Array(vertexCount * 4).fill(1);
   }
 
-  // material & texture
   const material = primitive.getMaterial();
   let materialData: MeshData["material"] = {
     baseColor: [1, 1, 1, 1],
@@ -296,8 +294,8 @@ export async function processPrimitive(
     }
   }
 
-  // ---------------------------------------------------
-  // qui castiamo gli indici da 16 a 32 bit, se servisse
+  //*  ---------------------------------------------------
+  //* upcast 16 to 32 bit
   let indices = primitive.getIndices()?.getArray() as
     | Uint16Array
     | Uint32Array
@@ -307,12 +305,9 @@ export async function processPrimitive(
     return null;
   }
   if (indices instanceof Uint16Array) {
-    // up-cast a 32 bit
+    //* up-cast a 32 bit
     indices = new Uint32Array(indices);
   }
-  // ---------------------------------------------------
-
-  // costruisco il buffer dei vertici
   const vertexData = new Float32Array(vertexCount * 12);
   for (let i = 0; i < vertexCount; i++) {
     const o = i * 12;
@@ -352,7 +347,7 @@ export async function processPrimitive(
     vertexBuffer,
     indexBuffer,
     indexCount: indices.length,
-    indexFormat: "uint32", // ora è sempre 32 bit
+    indexFormat: "uint32",
     transform: nodeTransform,
     transformBuffer,
     bindGroup: null as any,
@@ -372,7 +367,7 @@ export function createPipeline(
       entryPoint: "vs_main",
       buffers: [
         {
-          arrayStride: 3 * 4 + 3 * 4 + 2 * 4 + 4 * 4, // 48 bytes total
+          arrayStride: 3 * 4 + 3 * 4 + 2 * 4 + 4 * 4,
           attributes: [
             { shaderLocation: 0, offset: 0, format: "float32x3" }, // position
             { shaderLocation: 1, offset: 12, format: "float32x3" }, // normal
