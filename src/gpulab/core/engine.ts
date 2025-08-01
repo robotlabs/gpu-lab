@@ -31,15 +31,17 @@ export class Engine {
       type: CameraType.Perspective,
       fov: Math.PI / 3,
       aspect: canvas.width / canvas.height,
+      pos: cameraPos,
     });
 
     // Orthographic camera
     const orthoCam = new Camera({
       type: CameraType.Orthographic,
       aspect: canvas.width / canvas.height,
-      orthoSize: 15, // half-height of view volume
-      near: -50,
-      far: 50,
+      orthoSize: 5, // half-height of view volume
+      near: -20,
+      far: 20,
+      pos: cameraPos,
     });
     this.camera = perspCam; //new Camera(cameraPos);
   }

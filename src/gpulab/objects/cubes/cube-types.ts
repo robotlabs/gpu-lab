@@ -10,4 +10,6 @@ export type CubeProps = {
   scaleZ: number;
   shader: GPUShaderModule;
   cubeColor: [number, number, number, number];
+  wireframe?: boolean;
+  params: [number, number, number, number][];
 };

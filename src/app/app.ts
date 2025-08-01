@@ -56,10 +56,10 @@ export default class App {
     const device = this.engine.getDevice();
     const format = this.engine.getFormat();
 
-    // this.testCubes(device, format);
+    this.testCubes(device, format);
     // this.testGrids(device, format);
     // this.testGLBModel(device, format);
-    this.testGLBModel(device, format);
+    // this.testGLBModel(device, format);
     // this.testPlanes(device, format);
 
     this.setupResizeListener();
@@ -140,6 +140,7 @@ export default class App {
         .setAspect(
           this.engine.getCanvas().width / this.engine.getCanvas().height
         );
+      this.scene.updateCameraTransform();
     });
   }
   private startRendering(): void {
@@ -180,8 +181,20 @@ export default class App {
         scaleZ: Math.random() * 1,
         cubeColor: [Math.random(), Math.random(), Math.random(), 1],
         shader: cubeShaderModule,
+        wireframe: false,
+        params: [
+          [0.0, 0.0, 0.0, 0.0], // u_mouse.xy, u_time, u_duration
+          [0.0, 0.0, 0.0, 0.0], // u_resolution.xy, etc.
+        ],
       });
       this.scene.add(cube);
+
+      cube.updateProps((p) => {
+        // p.params[0][0] = this.easedMouse.x;
+        // p.params[0][1] = this.easedMouse.y;
+        p.params[0][2] = -0;
+        // You can add p.params[0][3] for duration if needed
+      });
 
       const tween = gsap.to(cube.getProps(), {
         posX: Math.random() * rnMultiplierPos - 3,
