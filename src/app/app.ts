@@ -26,6 +26,7 @@ import { PixelGridLayout } from "@/gpulab/objects/grids/pixel-grid-layout";
 import { createTextureFromImage } from "@/gpulab/objects/planes/plane-utils";
 import { vec3 } from "gl-matrix";
 import { GLBModel } from "@/gpulab/objects/glb/glb-model";
+import { Sphere } from "@/gpulab/objects/spheres/sphere";
 
 export default class App {
   private stats!: ReturnType<typeof Stats>;
@@ -102,6 +103,13 @@ export default class App {
     const format = this.engine.getFormat();
 
     this.testCubes(device, format);
+  }
+  public runSpheres() {
+    this.scene.clear();
+    const device = this.engine.getDevice();
+    const format = this.engine.getFormat();
+
+    this.testSpheres(device, format);
   }
   public runGrids() {
     this.scene.clear();
@@ -214,6 +222,62 @@ export default class App {
       });
 
       cube.addTween(tween);
+    }
+  }
+
+  private testSpheres(device: GPUDevice, format: GPUTextureFormat): void {
+    const cubeShaderModule = device.createShaderModule({ code: cubeShader });
+
+    //** single cube */
+    const rnMultiplierPos = 15;
+    for (let i = 0; i < 1000; i++) {
+      const sphereSizeRandom = Math.random() * 1;
+      const sphere = new Sphere(device, format, {
+        posX: Math.random() * rnMultiplierPos - 3,
+        posY: Math.random() * rnMultiplierPos - 3,
+        posZ: Math.random() * rnMultiplierPos - 0,
+        rotX: Math.random() * rnMultiplierPos,
+        rotY: Math.random() * rnMultiplierPos,
+        rotZ: Math.random() * rnMultiplierPos,
+        scaleX: sphereSizeRandom,
+        scaleY: sphereSizeRandom,
+        scaleZ: sphereSizeRandom,
+        sphereColor: [Math.random(), Math.random(), Math.random(), 1],
+        shader: cubeShaderModule,
+        wireframe: false,
+        params: [
+          [0.0, 0.0, 0.0, 0.0], // u_mouse.xy, u_time, u_duration
+          [0.0, 0.0, 0.0, 0.0], // u_resolution.xy, etc.
+        ],
+      });
+      this.scene.add(sphere);
+
+      sphere.updateProps((p) => {
+        // p.params[0][0] = this.easedMouse.x;
+        // p.params[0][1] = this.easedMouse.y;
+        p.params[0][2] = -0;
+        // You can add p.params[0][3] for duration if needed
+      });
+
+      const sphereSizeRandomNew = Math.random() * 1;
+      const tween = gsap.to(sphere.getProps(), {
+        posX: Math.random() * rnMultiplierPos - 3,
+        posY: Math.random() * rnMultiplierPos - 3,
+        posZ: Math.random() * rnMultiplierPos - 0,
+        rotX: Math.random() * rnMultiplierPos,
+        rotY: Math.random() * rnMultiplierPos,
+        rotZ: Math.random() * rnMultiplierPos,
+        scaleX: sphereSizeRandomNew,
+        scaleY: sphereSizeRandomNew,
+        scaleZ: sphereSizeRandomNew,
+        duration: 4,
+        repeat: -1,
+        yoyo: true,
+        ease: "power4.inOut",
+        onUpdate: () => sphere.updateCameraTransform(),
+      });
+
+      sphere.addTween(tween);
     }
   }
   private testGrids(device: GPUDevice, format: GPUTextureFormat): void {
