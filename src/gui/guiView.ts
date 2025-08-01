@@ -57,6 +57,18 @@ export class GUIView {
     });
 
     //@ts-ignore
+    this.pane.addButton({ title: "Run Sphere" }).on("click", () => {
+      if (
+        "runSpheres" in this.app &&
+        typeof this.app.runSpheres === "function"
+      ) {
+        this.app.runSpheres();
+      } else {
+        console.warn("runSpheres() is not defined on app.");
+      }
+    });
+
+    //@ts-ignore
     this.pane.addButton({ title: "Run Grids" }).on("click", () => {
       if ("runGrids" in this.app && typeof this.app.runGrids === "function") {
         this.app.runGrids();
