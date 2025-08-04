@@ -69,6 +69,15 @@ export class GUIView {
     });
 
     //@ts-ignore
+    this.pane.addButton({ title: "Run Torus" }).on("click", () => {
+      if ("runTorus" in this.app && typeof this.app.runTorus === "function") {
+        this.app.runTorus();
+      } else {
+        console.warn("runTorus() is not defined on app.");
+      }
+    });
+
+    //@ts-ignore
     this.pane.addButton({ title: "Run Grids" }).on("click", () => {
       if ("runGrids" in this.app && typeof this.app.runGrids === "function") {
         this.app.runGrids();
