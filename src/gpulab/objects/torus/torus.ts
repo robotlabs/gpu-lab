@@ -9,12 +9,7 @@ import {
 } from "../../core/matrix";
 import { Camera } from "../../core/camera";
 import { TorusProps } from "./torus-types";
-import {
-  createTorusGeometry,
-  createSingleTorusPipeline,
-  createSolidTorusPipelineWithOffset,
-  createWireframeTorusPipeline,
-} from "./torus-utils";
+import { createTorusGeometry, createSingleTorusPipeline } from "./torus-utils";
 
 export class Torus implements Object3D {
   private device: GPUDevice;
@@ -76,18 +71,18 @@ export class Torus implements Object3D {
     this.totalWireframeIndices = this.majorSegments * this.minorSegments * 12;
 
     // Create both solid and wireframe pipelines
-    this.pipeline = createSolidTorusPipelineWithOffset(
+    this.pipeline = createSingleTorusPipeline(
       this.device,
       this.format,
       this.props.shader,
-      this.props.depthOffset ?? 10 // Only solid rendering gets depth offset
+      false // solid
     );
 
-    this.wireframePipeline = createWireframeTorusPipeline(
+    this.wireframePipeline = createSingleTorusPipeline(
       this.device,
       this.format,
-      this.props.shader
-      // No depth offset for wireframe
+      this.props.shader,
+      true // wireframe
     );
 
     this.transformBuffer = this.device.createBuffer({

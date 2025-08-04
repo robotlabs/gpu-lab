@@ -10,23 +10,15 @@ interface TorusBuffers {
 // Generate torus geometry
 function generateTorus(
   majorRadius = 1.0,
-  minorRadius = 0.3, // Make sure minorRadius < majorRadius to avoid self-intersection
-  majorSegments = 64, // Increase tessellation for smoother curves
-  minorSegments = 32
+  minorRadius = 0.4,
+  majorSegments = 32,
+  minorSegments = 16
 ) {
-  // Ensure we don't create self-intersecting torus
-  if (minorRadius >= majorRadius) {
-    console.warn(
-      `Warning: minorRadius (${minorRadius}) should be < majorRadius (${majorRadius}) to avoid self-intersection`
-    );
-    minorRadius = majorRadius * 0.4; // Safe ratio
-  }
-
   const vertices: number[] = [];
   const indices: number[] = [];
   const wireframeIndices: number[] = [];
 
-  // Generate vertices with better parameterization
+  // Generate vertices
   for (let i = 0; i <= majorSegments; i++) {
     const u = (i / majorSegments) * Math.PI * 2;
     const cosU = Math.cos(u);
@@ -37,25 +29,23 @@ function generateTorus(
       const cosV = Math.cos(v);
       const sinV = Math.sin(v);
 
-      // Calculate position - this is the standard torus equation
+      // Position
       const x = (majorRadius + minorRadius * cosV) * cosU;
       const y = minorRadius * sinV;
       const z = (majorRadius + minorRadius * cosV) * sinU;
 
-      // Calculate proper normals
-      const centerX = majorRadius * cosU;
-      const centerZ = majorRadius * sinU;
+      // Correct normal calculation for torus
+      // The normal at any point on a torus surface points outward
+      // from the minor circle's center in the direction of that point
+      const nx = cosV * cosU;
+      const ny = sinV;
+      const nz = cosV * sinU;
 
-      // Normal points from the center of the tube outward
-      const normalX = cosV * cosU;
-      const normalY = sinV;
-      const normalZ = cosV * sinU;
-
-      vertices.push(x, y, z, normalX, normalY, normalZ);
+      vertices.push(x, y, z, nx, ny, nz);
     }
   }
 
-  // Generate indices with proper winding order
+  // Generate indices
   for (let i = 0; i < majorSegments; i++) {
     for (let j = 0; j < minorSegments; j++) {
       const a = i * (minorSegments + 1) + j;
@@ -63,7 +53,6 @@ function generateTorus(
       const c = (i + 1) * (minorSegments + 1) + (j + 1);
       const d = i * (minorSegments + 1) + (j + 1);
 
-      // Ensure consistent winding order (counter-clockwise)
       // First triangle
       indices.push(a, b, d);
       wireframeIndices.push(a, b, b, d, d, a);
@@ -121,85 +110,44 @@ export function createTorusGeometry(
   return { torusVertexBuffer, torusIndexBuffer, torusWireframeIndexBuffer };
 }
 
-export function createSolidTorusPipelineWithOffset(
+// Creates render pipeline for single torus instances
+export function createSingleTorusPipeline(
   device: GPUDevice,
   format: GPUTextureFormat,
   shaderModule: GPUShaderModule,
-  polygonOffset: number = 0
+  wireframe: boolean = false
 ): GPURenderPipeline {
   return device.createRenderPipeline({
-    label: "Single Torus Solid Pipeline",
+    label: wireframe
+      ? "Single Torus Wireframe Pipeline"
+      : "Single Torus Pipeline",
     layout: "auto",
     vertex: {
       module: shaderModule,
       entryPoint: "vs_main",
       buffers: [
         {
-          arrayStride: 6 * 4,
+          arrayStride: 6 * 4, // 3 floats position + 3 floats normal
           attributes: [
-            { shaderLocation: 0, offset: 0, format: "float32x3" },
-            { shaderLocation: 1, offset: 12, format: "float32x3" },
+            { shaderLocation: 0, offset: 0, format: "float32x3" }, // position
+            { shaderLocation: 1, offset: 12, format: "float32x3" }, // normal
           ],
         },
       ],
     },
     fragment: {
       module: shaderModule,
-      entryPoint: "fs_main",
+      entryPoint: wireframe ? "fs_wireframe" : "fs_main",
       targets: [{ format }],
     },
     primitive: {
-      topology: "triangle-list",
-      cullMode: "back",
-    },
-    depthStencil: {
-      format: "depth24plus",
-      depthWriteEnabled: true,
-      depthCompare: "less",
-      // Depth bias works with triangle-list
-      depthBias: Math.floor(polygonOffset * 1000),
-      depthBiasSlopeScale: 1.0,
-      depthBiasClamp: 0.01,
-    },
-    multisample: { count: sampleCount },
-  });
-}
-
-export function createWireframeTorusPipeline(
-  device: GPUDevice,
-  format: GPUTextureFormat,
-  shaderModule: GPUShaderModule
-): GPURenderPipeline {
-  return device.createRenderPipeline({
-    label: "Single Torus Wireframe Pipeline",
-    layout: "auto",
-    vertex: {
-      module: shaderModule,
-      entryPoint: "vs_main",
-      buffers: [
-        {
-          arrayStride: 6 * 4,
-          attributes: [
-            { shaderLocation: 0, offset: 0, format: "float32x3" },
-            { shaderLocation: 1, offset: 12, format: "float32x3" },
-          ],
-        },
-      ],
-    },
-    fragment: {
-      module: shaderModule,
-      entryPoint: "fs_wireframe",
-      targets: [{ format }],
-    },
-    primitive: {
-      topology: "line-list",
+      topology: wireframe ? "line-list" : "triangle-list",
       cullMode: "none",
     },
     depthStencil: {
       format: "depth24plus",
       depthWriteEnabled: true,
       depthCompare: "less",
-      // NO depth bias for line-list topology
     },
     multisample: { count: sampleCount },
   });
